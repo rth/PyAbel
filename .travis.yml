@@ -3,13 +3,16 @@ sudo: false
 matrix:
   include:
   - python: '3.5'
-    env: DEPS="numpy scipy nose cython"
+    env: DEPS="numpy scipy nose cython" RUN_EXAMPLES=false
   - python: '3.4'
-    env: DEPS="numpy scipy nose cython"
+    env: DEPS="numpy scipy nose cython" RUN_EXAMPLES=false
 #  - python: '3.3'
-#    env: DEPS="numpy scipy nose cython"
+#    env: DEPS="numpy scipy nose cython" RUN_EXAMPLES=false
   - python: '2.7'
-    env: DEPS="numpy scipy nose cython"
+    env: DEPS="numpy scipy nose cython" RUN_EXAMPLES=false
+  - python: '3.5'
+    env: DEPS="numpy scipy nose cython" RUN_EXAMPLES=true
+
 install:
 - wget http://repo.continuum.io/miniconda/Miniconda${TRAVIS_PYTHON_VERSION:0:1}-latest-Linux-x86_64.sh
   -O miniconda.sh
@@ -25,6 +28,19 @@ install:
 - python setup.py install
 script:
 - nosetests -vv --with-coverage --cover-package=abel abel/tests
+- | 
+    if [ $RUN_EXAMPLES ]; then
+        pip install matplotlib==1.5.3
+        cd examples/
+        set -o pipefail
+        for f in ./*example*.py; do
+           python $f >> log.txt
+        done
+    else
+        touch log.txt
+    fi
+    cat log.txt && if grep -q "Traceback (most recent call last):" ~/log.txt; then false; else true; fi
+
 deploy:
   provider: pypi
   user: DanHickstein
