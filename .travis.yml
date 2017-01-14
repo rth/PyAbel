@@ -20,6 +20,8 @@ install:
 - conda config --set always_yes yes --set changeps1 no
 - conda update --yes conda
 - conda install --yes -c conda conda-env
+- conda info -a
+- curl -I https://repo.continuum.io/pkgs/free/linux-64/repodata.json.bz2
 - conda install --yes $DEPS pip python=${TRAVIS_PYTHON_VERSION}
 - pip install coveralls
 - python setup.py install
